@@ -40,16 +40,16 @@ my %freqs;
 my $bismark_version = 'v0.20.0_dev';
 
 GetOptions ('verbose' => \$verbose,
-	    'help' => \$help,
-	    'man' => \$man,
-	    'version' => \$version,
-	    'path_to_bowtie:s' => \$path_to_bowtie,
-	    'parallel:i' => \$parallel,
-	    'single_fasta' => \$single_fasta,
-	    'bowtie2' => \$bowtie2,
-	    'bowtie1' => \$bowtie1,
-	    'genomic_composition' => \$genomic_composition,
-	   );
+        'help' => \$help,
+        'man' => \$man,
+        'version' => \$version,
+        'path_to_bowtie:s' => \$path_to_bowtie,
+        'parallel:i' => \$parallel,
+        'single_fasta' => \$single_fasta,
+        'bowtie2' => \$bowtie2,
+        'bowtie1' => \$bowtie1,
+        'genomic_composition' => \$genomic_composition,
+       );
 
 if ($help or $man){
   print_helpfile();
@@ -75,15 +75,15 @@ my %chromosomes; # checking if chromosome names are unique (required)
 # Ensuring a genome folder has been specified
 if ($genome_folder){
     unless ($genome_folder =~ /\/$/){
-	$genome_folder =~ s/$/\//;
+    $genome_folder =~ s/$/\//;
     }
     $verbose and print "Path to genome folder specified as: $genome_folder\n";
     chdir $genome_folder or die "Could't move to directory $genome_folder. Make sure the directory exists! $!";
-    
+
     # making the genome folder path abolsolute so it won't break if the path was specified relative
     $genome_folder = getcwd();
     unless ($genome_folder =~ /\/$/){
-	$genome_folder =~ s/$/\//;
+    $genome_folder =~ s/$/\//;
     }
 }
 else{
@@ -93,7 +93,7 @@ if (defined $parallel){
     die "--parallel should have a value of 2 or more. Please respecify\n\n" unless ($parallel > 1);
 
     if ($bowtie1){
-	warn "PLEASE NOTICE: Parallel indexing with Bowtie1 requires a very recent version of Bowtie (v1.2.1 or newer)\n\n"; sleep(3);
+    warn "PLEASE NOTICE: Parallel indexing with Bowtie1 requires a very recent version of Bowtie (v1.2.1 or newer)\n\n"; sleep(3);
     }
     warn "Using $parallel threads for the top and bottom strand indexing processes each, so using ",$parallel*2," cores in total\n"; sleep(1);
 }
@@ -104,17 +104,17 @@ my $GA_dir;
 
 if ($bowtie1){
     if ($bowtie2){
-	die "You may not select both --bowtie1 and --bowtie2. Make your pick! (default is Bowtie2)\n";
+    die "You may not select both --bowtie1 and --bowtie2. Make your pick! (default is Bowtie2)\n";
     }
     $bowtie2 = 0;
     $verbose and print "Aligner to be used: Bowtie (1)\n";
 }
 else{ # Bowtie 2 is now the default mode (as of 27 July 2015)
     if ($bowtie2){
-	$verbose and print "Aligner to be used: Bowtie 2 (user-defined)\n";
+    $verbose and print "Aligner to be used: Bowtie 2 (user-defined)\n";
     }
     else{
-	$verbose and print "Aligner to be used: Bowtie 2 (default)\n";
+    $verbose and print "Aligner to be used: Bowtie 2 (default)\n";
     }
     $bowtie2 = 1;
 }
@@ -143,31 +143,31 @@ launch_bowtie_indexer();
 
 sub launch_bowtie_indexer{
     if ($bowtie2){
-	warn "Bismark Genome Preparation - Step III: Launching the Bowtie 2 indexer\n";
+    warn "Bismark Genome Preparation - Step III: Launching the Bowtie 2 indexer\n";
     }
     else{
-	warn "Bismark Genome Preparation - Step III: Launching the Bowtie (1) indexer\n";
+    warn "Bismark Genome Preparation - Step III: Launching the Bowtie (1) indexer\n";
     }
     print "Please be aware that this process can - depending on genome size - take several hours!\n";
     sleep(1);
-    
+
     ### if the path to bowtie was specfified explicitely
     if ($path_to_bowtie){
-	if ($bowtie2){
-	    $path_to_bowtie =~ s/$/bowtie2-build/;
-	}
-	else{
-	    $path_to_bowtie =~ s/$/bowtie-build/;
-	}
+    if ($bowtie2){
+        $path_to_bowtie =~ s/$/bowtie2-build/;
+    }
+    else{
+        $path_to_bowtie =~ s/$/bowtie-build/;
+    }
     }
     ### otherwise we assume that bowtie-build is in the path
     else{
-	if ($bowtie2){
-	    $path_to_bowtie = 'bowtie2-build';
-	}
-	else{
-	    $path_to_bowtie = 'bowtie-build';
-	}
+    if ($bowtie2){
+        $path_to_bowtie = 'bowtie2-build';
+    }
+    else{
+        $path_to_bowtie = 'bowtie-build';
+    }
     }
 
   $verbose and print "\n";
@@ -188,7 +188,7 @@ sub launch_bowtie_indexer{
     }
     $verbose and print "Parent process: Starting to index C->T converted genome with the following command:\n\n";
     $verbose and print "$cmd\n\n";
-    
+
     system ($cmd)== 0 or die "Parent process: Failed to build index\n";
     waitpid( $pid, 0 );
     $? == 0 or die "Parent process: Child process failed\n";
@@ -248,124 +248,124 @@ sub launch_bowtie_indexer{
 
 
 sub process_sequence_files {
-    
-    
+
+
     my ($total_CT_conversions,$total_GA_conversions) = (0,0);
     $verbose and print "Bismark Genome Preparation - Step II: Bisulfite converting reference genome\n\n";
     sleep (1);
-    
+
     chdir $genome_folder or die "Could't move to directory $genome_folder $!";
-    
+
     $verbose and print "conversions performed:\n";
     $verbose and print join("\t",'chromosome','C->T','G->A'),"\n";
-    
-    
+
+
     ### If someone wants to index a genome which consists of thousands of contig and scaffold files we need to write the genome conversions into an MFA file
     ### Otherwise the list of comma separated chromosomes we provide for bowtie-build will get too long for the kernel to handle
     ### This is now the default option
-    
+
     if ($multi_fasta){
-	### Here we just use one multi FastA file name, append .CT_conversion or .GA_conversion and print all sequence conversions into these files
-	my $bisulfite_CT_conversion_filename = "$CT_dir/genome_mfa.CT_conversion.fa";
-	open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
-	
-	my $bisulfite_GA_conversion_filename = "$GA_dir/genome_mfa.GA_conversion.fa";
-	open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
+    ### Here we just use one multi FastA file name, append .CT_conversion or .GA_conversion and print all sequence conversions into these files
+    my $bisulfite_CT_conversion_filename = "$CT_dir/genome_mfa.CT_conversion.fa";
+    open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
+
+    my $bisulfite_GA_conversion_filename = "$GA_dir/genome_mfa.GA_conversion.fa";
+    open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
     }
-    
+
     foreach my $filename(@filenames){
-	my ($chromosome_CT_conversions,$chromosome_GA_conversions) = (0,0);
-	if ($filename =~ /\.gz$/){
-	    open (IN,"gunzip -c $filename |") or die "Failed to read from sequence file $filename $!\n";
-	}
-	else{
-	    open (IN,$filename) or die "Failed to read from sequence file $filename $!\n";
-	}
-	# warn "Reading chromosome information from $filename\n\n";
-	
-	### first line needs to be a fastA header
-	my $first_line = <IN>;
-	chomp $first_line;
-	
-	### Extracting chromosome name from the FastA header
-	my $chromosome_name = extract_chromosome_name($first_line);
-	
-	### Exiting if a chromosome with the same name was present already
-	if (exists $chromosomes{$chromosome_name}){
-	    die "Exiting because chromosome name '$chromosome_name' already exists. Please make sure all chromosomes have a unique name!\n";
-	}
-	else{
-	    $chromosomes{$chromosome_name}++;
-	}
-	
-	### alternatively, chromosomes can be written out into single-entry FastA files. This will only work for genomes with up to a few hundred chromosomes.
-	unless ($multi_fasta){
-	    my $bisulfite_CT_conversion_filename = "$CT_dir/$chromosome_name";
-	    $bisulfite_CT_conversion_filename =~ s/$/.CT_conversion.fa/;
-	    open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
-	    
-	    my $bisulfite_GA_conversion_filename = "$GA_dir/$chromosome_name";
-	    $bisulfite_GA_conversion_filename =~ s/$/.GA_conversion.fa/;
-	    open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
-	}
-	
-	print CT_CONVERT ">",$chromosome_name,"_CT_converted\n"; # first entry
-	print GA_CONVERT ">",$chromosome_name,"_GA_converted\n"; # first entry
-	
-	
-	while (<IN>){
-	    
+    my ($chromosome_CT_conversions,$chromosome_GA_conversions) = (0,0);
+    if ($filename =~ /\.gz$/){
+        open (IN,"pigz -p $parallel -d -c $filename |") or die "Failed to read from sequence file $filename $!\n";
+    }
+    else{
+        open (IN,$filename) or die "Failed to read from sequence file $filename $!\n";
+    }
+    # warn "Reading chromosome information from $filename\n\n";
+
+    ### first line needs to be a fastA header
+    my $first_line = <IN>;
+    chomp $first_line;
+
+    ### Extracting chromosome name from the FastA header
+    my $chromosome_name = extract_chromosome_name($first_line);
+
+    ### Exiting if a chromosome with the same name was present already
+    if (exists $chromosomes{$chromosome_name}){
+        die "Exiting because chromosome name '$chromosome_name' already exists. Please make sure all chromosomes have a unique name!\n";
+    }
+    else{
+        $chromosomes{$chromosome_name}++;
+    }
+
+    ### alternatively, chromosomes can be written out into single-entry FastA files. This will only work for genomes with up to a few hundred chromosomes.
+    unless ($multi_fasta){
+        my $bisulfite_CT_conversion_filename = "$CT_dir/$chromosome_name";
+        $bisulfite_CT_conversion_filename =~ s/$/.CT_conversion.fa/;
+        open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
+
+        my $bisulfite_GA_conversion_filename = "$GA_dir/$chromosome_name";
+        $bisulfite_GA_conversion_filename =~ s/$/.GA_conversion.fa/;
+        open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
+    }
+
+    print CT_CONVERT ">",$chromosome_name,"_CT_converted\n"; # first entry
+    print GA_CONVERT ">",$chromosome_name,"_GA_converted\n"; # first entry
+
+
+    while (<IN>){
+
       ### in case the line is a new fastA header
       if ($_ =~ /^>/){
-	### printing out the stats for the previous chromosome
-	$verbose and print join ("\t",$chromosome_name,$chromosome_CT_conversions,$chromosome_GA_conversions),"\n";
-	### resetting the chromosome transliteration counters
-	($chromosome_CT_conversions,$chromosome_GA_conversions) = (0,0);
-	
-	### Extracting chromosome name from the additional FastA header
-	$chromosome_name = extract_chromosome_name($_);
+    ### printing out the stats for the previous chromosome
+    $verbose and print join ("\t",$chromosome_name,$chromosome_CT_conversions,$chromosome_GA_conversions),"\n";
+    ### resetting the chromosome transliteration counters
+    ($chromosome_CT_conversions,$chromosome_GA_conversions) = (0,0);
 
-	### alternatively, chromosomes can be written out into single-entry FastA files. This will only work for genomes with up to a few hundred chromosomes.
-	unless ($multi_fasta){
-	  my $bisulfite_CT_conversion_filename = "$CT_dir/$chromosome_name";
-	  $bisulfite_CT_conversion_filename =~ s/$/.CT_conversion.fa/;
-	  open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
-	
-	  my $bisulfite_GA_conversion_filename = "$GA_dir/$chromosome_name";
-	  $bisulfite_GA_conversion_filename =~ s/$/.GA_conversion.fa/;
-	  open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
-	}
+    ### Extracting chromosome name from the additional FastA header
+    $chromosome_name = extract_chromosome_name($_);
 
-	print CT_CONVERT ">",$chromosome_name,"_CT_converted\n";
-	print GA_CONVERT ">",$chromosome_name,"_GA_converted\n";
+    ### alternatively, chromosomes can be written out into single-entry FastA files. This will only work for genomes with up to a few hundred chromosomes.
+    unless ($multi_fasta){
+      my $bisulfite_CT_conversion_filename = "$CT_dir/$chromosome_name";
+      $bisulfite_CT_conversion_filename =~ s/$/.CT_conversion.fa/;
+      open (CT_CONVERT,'>',$bisulfite_CT_conversion_filename) or die "Can't write to file $bisulfite_CT_conversion_filename: $!\n";
+
+      my $bisulfite_GA_conversion_filename = "$GA_dir/$chromosome_name";
+      $bisulfite_GA_conversion_filename =~ s/$/.GA_conversion.fa/;
+      open (GA_CONVERT,'>',$bisulfite_GA_conversion_filename) or die "Can't write to file $bisulfite_GA_conversion_filename: $!\n";
+    }
+
+    print CT_CONVERT ">",$chromosome_name,"_CT_converted\n";
+    print GA_CONVERT ">",$chromosome_name,"_GA_converted\n";
       }
 
       else{
-	my $sequence = uc$_;
+    my $sequence = uc$_;
 
-	### (I) First replacing all ambiguous sequence characters (such as M,S,R....) by N (G,A,T,C,N and the line endings \r and \n are added to a character group)
-	
-	$sequence =~ s/[^ATCGN\n\r]/N/g;
-	
-	### (II) Writing the chromosome out into a C->T converted version (equals forward strand conversion)
-	
-	my $CT_sequence = $sequence;
-	my $CT_transliterations_performed = ($CT_sequence =~ tr/C/T/); # converts all Cs into Ts
-	$total_CT_conversions += $CT_transliterations_performed;
-	$chromosome_CT_conversions += $CT_transliterations_performed;
-	
-	print CT_CONVERT $CT_sequence;
-	
-	### (III) Writing the chromosome out in a G->A converted version of the forward strand (this is equivalent to reverse-
-	### complementing the forward strand and then C->T converting it)
-	
-	my $GA_sequence = $sequence;
-	my $GA_transliterations_performed = ($GA_sequence =~ tr/G/A/); # converts all Gs to As on the forward strand
-	$total_GA_conversions += $GA_transliterations_performed;
-	$chromosome_GA_conversions += $GA_transliterations_performed;
-	
-	print GA_CONVERT $GA_sequence;
-	
+    ### (I) First replacing all ambiguous sequence characters (such as M,S,R....) by N (G,A,T,C,N and the line endings \r and \n are added to a character group)
+
+    $sequence =~ s/[^ATCGN\n\r]/N/g;
+
+    ### (II) Writing the chromosome out into a C->T converted version (equals forward strand conversion)
+
+    my $CT_sequence = $sequence;
+    my $CT_transliterations_performed = ($CT_sequence =~ tr/C/T/); # converts all Cs into Ts
+    $total_CT_conversions += $CT_transliterations_performed;
+    $chromosome_CT_conversions += $CT_transliterations_performed;
+
+    print CT_CONVERT $CT_sequence;
+
+    ### (III) Writing the chromosome out in a G->A converted version of the forward strand (this is equivalent to reverse-
+    ### complementing the forward strand and then C->T converting it)
+
+    my $GA_sequence = $sequence;
+    my $GA_transliterations_performed = ($GA_sequence =~ tr/G/A/); # converts all Gs to As on the forward strand
+    $total_GA_conversions += $GA_transliterations_performed;
+    $chromosome_GA_conversions += $GA_transliterations_performed;
+
+    print GA_CONVERT $GA_sequence;
+
       }
     }
     $verbose and print join ("\t",$chromosome_name,$chromosome_CT_conversions,$chromosome_GA_conversions),"\n";
@@ -382,58 +382,58 @@ sub process_sequence_files {
 }
 
 sub get_genomic_frequencies{
-    
+
     warn "Calculating genomic frequencies (this may take several minutes depending on genome size) ...\n";
     warn "="x164,"\n";
     read_genome_into_memory($parent_dir);
     foreach my $chr (keys %chromosomes){
-	warn "Processing chromosome >> $chr <<\n";
-	process_sequence($chromosomes{$chr});
+    warn "Processing chromosome >> $chr <<\n";
+    process_sequence($chromosomes{$chr});
     }
-    
+
     %genomic_freqs = %freqs;
-    
+
     ### Attempting to write a genomic nucleotide frequency table out to the genome folder so we can re-use it next time without the need to re-calculate
     ### if this fails
     if  ( open (FREQS,'>',"${genome_folder}genomic_nucleotide_frequencies.txt") ){
-	warn "Writing genomic nucleotide frequencies to the file >${genome_folder}genomic_nucleotide_frequencies.txt< for future re-use\n";
-	foreach my $f(sort keys %genomic_freqs){
-	    warn "Writing count of (di-)nucleotide: $f\t$genomic_freqs{$f}\n";
-	    print FREQS "$f\t$genomic_freqs{$f}\n";
-	}
-	close FREQS or warn "Failed to close filehandle FREQS: $!\n\n";
+    warn "Writing genomic nucleotide frequencies to the file >${genome_folder}genomic_nucleotide_frequencies.txt< for future re-use\n";
+    foreach my $f(sort keys %genomic_freqs){
+        warn "Writing count of (di-)nucleotide: $f\t$genomic_freqs{$f}\n";
+        print FREQS "$f\t$genomic_freqs{$f}\n";
+    }
+    close FREQS or warn "Failed to close filehandle FREQS: $!\n\n";
     }
     else{
-	warn "Failed to write out file ${genome_folder}genomic_nucleotide_frequencies.txt because of: $!. Skipping writing out genomic frequency table\n\n";
+    warn "Failed to write out file ${genome_folder}genomic_nucleotide_frequencies.txt because of: $!. Skipping writing out genomic frequency table\n\n";
     }
 }
 
 
 sub process_sequence{
-    
+
     my $seq = shift;
     my $mono;
     my $di;
 
     foreach my $index (0..(length$seq)-1){
-	my $counted = 0;
-	if ($index%10000000==0){
-	    # warn "Current index number is $index\n";
-	}
-	
-	$mono = substr($seq,$index,1);
-	unless ( $mono eq 'N'){
-	    $freqs{$mono}++;
-	}
-	
-	unless ( ($index + 2) > length$seq ){
-	    $di = substr($seq,$index,2);
-	    if (index($di,'N') < 0) {
-		$freqs{$di}++;
-	    }
-	}
+    my $counted = 0;
+    if ($index%10000000==0){
+        # warn "Current index number is $index\n";
     }
-    
+
+    $mono = substr($seq,$index,1);
+    unless ( $mono eq 'N'){
+        $freqs{$mono}++;
+    }
+
+    unless ( ($index + 2) > length$seq ){
+        $di = substr($seq,$index,2);
+        if (index($di,'N') < 0) {
+        $freqs{$di}++;
+        }
+    }
+    }
+
 }
 
 sub extract_chromosome_name {
@@ -459,10 +459,10 @@ sub create_bisulfite_genome_folders{
     }
     if (chdir $path_to_bowtie){
       if ($bowtie2){
-	$verbose and print "Path to Bowtie 2 specified: $path_to_bowtie\n";
+    $verbose and print "Path to Bowtie 2 specified: $path_to_bowtie\n";
       }
       else{
-	$verbose and print "Path to Bowtie (1) specified: $path_to_bowtie\n";
+    $verbose and print "Path to Bowtie (1) specified: $path_to_bowtie\n";
       }
     }
     else{
@@ -475,7 +475,7 @@ sub create_bisulfite_genome_folders{
 
   # Exiting unless there are fastA files in the folder
   my @filenames = <*.fa>;
-  
+
   ### if there aren't any genomic files with the extension .fa we will look for files with the extension .fa.gz
   unless (@filenames){
       @filenames =  <*.fa.gz>;
@@ -535,12 +535,12 @@ sub read_genome_into_memory{
   warn "Now reading in and storing sequence information of the genome specified in: $genome_folder\n\n";
 
   my @chromosome_filenames =  <*.fa>;
-  
+
   ### if there aren't any genomic files with the extension .fa we will look for files with the extension .fa.gz
   unless (@chromosome_filenames){
       @chromosome_filenames =  <*.fa.gz>;
   }
-  
+
   ### if there aren't any genomic files with the extension .fa or .fq.gz we will look for files with the extension .fasta
   unless (@chromosome_filenames){
       @chromosome_filenames =  <*.fasta>;
@@ -555,49 +555,49 @@ sub read_genome_into_memory{
   }
 
   foreach my $chromosome_filename (@chromosome_filenames){
-      
+
       # skipping the tophat entire mouse genome fasta file
       next if ($chromosome_filename eq 'Mus_musculus.NCBIM37.fa');
       if( $chromosome_filename =~ /\.gz$/){
-	  open (CHR_IN,"gunzip -c $chromosome_filename |") or die "Failed to read from sequence file $chromosome_filename $!\n";	
+      open (CHR_IN,"pigz -p $parallel -d -c $chromosome_filename |") or die "Failed to read from sequence file $chromosome_filename $!\n";
       }
       else{
-	  open (CHR_IN,$chromosome_filename) or die "Failed to read from sequence file $chromosome_filename $!\n";
+      open (CHR_IN,$chromosome_filename) or die "Failed to read from sequence file $chromosome_filename $!\n";
       }
-      
+
       ### first line needs to be a fastA header
       my $first_line = <CHR_IN>;
       chomp $first_line;
       $first_line =~ s/\r//; # removing /r carriage returns
-      
+
       ### Extracting chromosome name from the FastA header
       my $chromosome_name = extract_chromosome_name($first_line);
-      
+
       my $sequence;
       while (<CHR_IN>){
-	  chomp;
-	  $_ =~ s/\r//; # removing /r carriage returns
-	  if ($_ =~ /^>/){
-	      ### storing the previous chromosome in the %chromosomes hash, only relevant for Multi-Fasta-Files (MFA)
-	      if (exists $chromosomes{$chromosome_name}){
-		  warn "chr $chromosome_name (",length $sequence ," bp)\n";
-		  die "Exiting because chromosome name '$chromosome_name' already exists. Please make sure all chromosomes have a unique name!\n";
-	      }
-	      else {
-		  if (length($sequence) == 0){
-		      warn "Chromosome $chromosome_name in the multi-fasta file $chromosome_filename did not contain any sequence information!\n";
-		  }
-		  warn "chr $chromosome_name (",length $sequence ," bp)\n";
-	  $chromosomes{$chromosome_name} = $sequence;
-	      }
-	      ### resetting the sequence variable
-	      $sequence = '';
-	      ### setting new chromosome name
-	      $chromosome_name = extract_chromosome_name($_);
-	  }
-	  else{
-	      $sequence .= uc$_;
-	  }
+      chomp;
+      $_ =~ s/\r//; # removing /r carriage returns
+      if ($_ =~ /^>/){
+          ### storing the previous chromosome in the %chromosomes hash, only relevant for Multi-Fasta-Files (MFA)
+          if (exists $chromosomes{$chromosome_name}){
+          warn "chr $chromosome_name (",length $sequence ," bp)\n";
+          die "Exiting because chromosome name '$chromosome_name' already exists. Please make sure all chromosomes have a unique name!\n";
+          }
+          else {
+          if (length($sequence) == 0){
+              warn "Chromosome $chromosome_name in the multi-fasta file $chromosome_filename did not contain any sequence information!\n";
+          }
+          warn "chr $chromosome_name (",length $sequence ," bp)\n";
+      $chromosomes{$chromosome_name} = $sequence;
+          }
+          ### resetting the sequence variable
+          $sequence = '';
+          ### setting new chromosome name
+          $chromosome_name = extract_chromosome_name($_);
+      }
+      else{
+          $sequence .= uc$_;
+      }
       }
 
     if (exists $chromosomes{$chromosome_name}){
@@ -606,7 +606,7 @@ sub read_genome_into_memory{
     }
     else{
       if (length($sequence) == 0){
-	warn "Chromosome $chromosome_name in the file $chromosome_filename did not contain any sequence information!\n";
+    warn "Chromosome $chromosome_name in the file $chromosome_filename did not contain any sequence information!\n";
       }
       warn "chr $chromosome_name (",length $sequence ," bp)\n";
       $chromosomes{$chromosome_name} = $sequence;
